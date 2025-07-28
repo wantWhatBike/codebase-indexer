@@ -45,12 +45,40 @@ func TestIndexSummary(t *testing.T) {
 	assert.NotNil(t, result.Data.CodeGraph)
 }
 
-func TestIndexTask(t *testing.T) {
+func TestIndexCodegraphTask(t *testing.T) {
 	var result response.Response[types.IndexTaskResponseData]
 	reqBody := types.IndexTaskRequest{
 		ClientId:     "test-client-123",
 		CodebasePath: "\\tmp\\projects\\go\\kubernetes",
 		IndexType:    "codegraph",
+	}
+
+	err := doRequest(http.MethodPost, "/codebase-indexer/api/v1/index/task", nil, reqBody, &result)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 0, result.Code)
+}
+
+func TestIndexEmbeddingTask(t *testing.T) {
+	var result response.Response[types.IndexTaskResponseData]
+	reqBody := types.IndexTaskRequest{
+		ClientId:     "test-client-123",
+		CodebasePath: "\\tmp\\projects\\go\\kubernetes",
+		IndexType:    "embedding",
+	}
+
+	err := doRequest(http.MethodPost, "/codebase-indexer/api/v1/index/task", nil, reqBody, &result)
+
+	assert.NoError(t, err)
+	assert.Equal(t, 0, result.Code)
+}
+
+func TestIndexAllTask(t *testing.T) {
+	var result response.Response[types.IndexTaskResponseData]
+	reqBody := types.IndexTaskRequest{
+		ClientId:     "test-client-123",
+		CodebasePath: "\\tmp\\projects\\go\\kubernetes",
+		IndexType:    "all",
 	}
 
 	err := doRequest(http.MethodPost, "/codebase-indexer/api/v1/index/task", nil, reqBody, &result)

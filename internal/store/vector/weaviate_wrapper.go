@@ -5,6 +5,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"github.com/zeromicro/go-zero/core/logx"
 	"math"
 	"reflect"
 	"strings"
@@ -60,7 +61,7 @@ func New(cfg config.VectorStoreConf, embedder Embedder, reranker Reranker) (Stor
 	// init class
 	err = store.createClassWithAutoTenantEnabled(client)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create class: %w", err)
+		logx.Errorf("failed to create class: %w", err)
 	}
 
 	return store, nil
