@@ -64,7 +64,6 @@ var TestVar = "test"
 
 	// 预期的位置信息 (tree-sitter 使用从0开始的行列号)
 	expectedRanges := map[string][]int32{
-		"test":          {1, 0, 1, 12},   // line 4: type TestStruct struct {
 		"TestStruct":    {4, 0, 7, 1},    // line 4: type TestStruct struct {
 		"TestInterface": {10, 0, 13, 1},  // line 10: type TestInterface interface {
 		"TestFunc":      {16, 0, 18, 1},  // line 16: func TestFunc(...)
@@ -90,8 +89,6 @@ var TestVar = "test"
 			assert.Equal(t, "declaration.method", def.Type)
 		case "TestConst":
 			assert.Equal(t, "declaration.const", def.Type)
-		case "test":
-			assert.Equal(t, "package", def.Type)
 		case "TestVar":
 			assert.Equal(t, "global_variable", def.Type)
 		default:

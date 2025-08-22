@@ -149,7 +149,7 @@ func NewFromFile(path string) (PolicyList, error) {
 	}, nil, &result)
 
 	assert.NoError(t, err)
-	assert.Equal(t, 0, result.Code)
+	assert.Equal(t, "0", result.Code)
 	assert.NotNil(t, result.Data)
 	assert.NotNil(t, result.Data.List)
 

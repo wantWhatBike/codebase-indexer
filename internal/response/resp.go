@@ -8,15 +8,15 @@ import (
 )
 
 const (
-	CodeOK = 0
+	CodeOK = "0"
 
 	MessageOk = "ok"
 
-	CodeError = -1
+	CodeError = "-1"
 )
 
 type Response[T any] struct {
-	Code    int    `json:"code"`
+	Code    string `json:"code"`
 	Message string `json:"message"`
 	Success bool   `json:"success"`
 	Data    T      `json:"data,omitempty"`

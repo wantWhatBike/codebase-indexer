@@ -36,7 +36,7 @@ func NewSemanticSearchLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Se
 	}
 }
 
-func (l *SemanticLogic) SemanticSearch(req *types.SemanticSearchRequest) (resp *types.SemanticSearchResponseData, err error) {
+func (l *SemanticLogic) SemanticSearch(req *types.SemanticSearchGetRequest) (resp *types.SemanticSearchResponseData, err error) {
 	topK := req.TopK
 	if topK < minPositive {
 		topK = defaultTopK

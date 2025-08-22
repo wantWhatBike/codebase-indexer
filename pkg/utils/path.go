@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"fmt"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -55,4 +57,32 @@ func IsHiddenFile(path string) bool {
 	}
 
 	return false
+}
+
+// AbsToRel 将绝对路径转换为相对于基准目录的相对路径
+// 支持Windows、Linux、macOS等操作系统
+func AbsToRel(baseDir, absPath string) (string, error) {
+	absBase := filepath.Clean(baseDir)
+	// 2. 标准化目标绝对路径
+	absPath = filepath.Clean(absPath)
+
+	// 3. 特殊处理：Windows系统下检查是否同盘符
+	if runtime.GOOS == "windows" {
+		baseVol := filepath.VolumeName(absBase)
+		pathVol := filepath.VolumeName(absPath)
+
+		// 不同盘符无法转换为相对路径
+		if baseVol != pathVol {
+			return "", fmt.Errorf("基准目录(%s)与目标路径(%s)位于不同盘符，无法转换", baseVol, pathVol)
+		}
+	}
+
+	// 4. 计算相对路径
+	relPath, err := filepath.Rel(absBase, absPath)
+	if err != nil {
+		return "", fmt.Errorf("计算相对路径失败: %w", err)
+	}
+
+	// 5. 统一使用正斜杠输出（可选，根据需求调整）
+	return filepath.ToSlash(relPath), nil
 }

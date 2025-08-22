@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"path/filepath"
 	"testing"
 )
 
@@ -87,6 +88,85 @@ func TestHidden(t *testing.T) {
 			require.Equal(t, tc.expected, result,
 				"expected %v for path %q, got %v",
 				tc.expected, tc.path, result)
+		})
+	}
+}
+
+// 测试用例结构体定义
+type absToRelTest struct {
+	name      string // 测试用例名称
+	baseDir   string // 基准目录
+	absPath   string // 绝对路径
+	wantRel   string // 预期相对路径
+	expectErr bool   // 是否预期产生错误
+}
+
+// 表格驱动测试
+func TestAbsToRel(t *testing.T) {
+	// 构建测试用例集合
+	tests := []absToRelTest{
+		{
+			name:    "同一目录下的文件",
+			baseDir: "/home/user/project",
+			absPath: "/home/user/project/readme.md",
+			wantRel: "readme.md",
+		},
+		{
+			name:    "子目录下的文件",
+			baseDir: "/home/user/project",
+			absPath: "/home/user/project/docs/api.md",
+			wantRel: "docs/api.md",
+		},
+		{
+			name:    "父目录文件（跨层级）",
+			baseDir: "/home/user/project/src",
+			absPath: "/home/user/config.ini",
+			wantRel: "../../config.ini",
+		},
+		{
+			name:      "不同磁盘（Windows，预期错误）",
+			baseDir:   "C:\\user\\docs",
+			absPath:   "D:\\data\\file.txt",
+			expectErr: true,
+		},
+		{
+			name:    "同级目录",
+			baseDir: "/a/b/c",
+			absPath: "/a/b/d/file.txt",
+			wantRel: "../d/file.txt",
+		},
+		{
+			name:    "根目录下的文件",
+			baseDir: "/",
+			absPath: "/etc/hosts",
+			wantRel: "etc/hosts",
+		},
+	}
+
+	// 遍历执行测试用例
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotRel, err := AbsToRel(tt.baseDir, tt.absPath)
+
+			// 验证错误是否符合预期
+			if (err != nil) != tt.expectErr {
+				t.Errorf("AbsToRel() 错误 = %v, 预期错误 %v", err, tt.expectErr)
+				return
+			}
+
+			// 如果预期有错误则不需要继续验证结果
+			if tt.expectErr {
+				return
+			}
+
+			// 统一路径分隔符后再比较（确保跨平台兼容性）
+			gotRel = filepath.Clean(gotRel)
+			wantRel := filepath.Clean(tt.wantRel)
+
+			// 验证转换结果
+			if gotRel != wantRel {
+				t.Errorf("AbsToRel() = %v, 预期 %v", gotRel, wantRel)
+			}
 		})
 	}
 }

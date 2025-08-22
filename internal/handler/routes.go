@@ -66,7 +66,12 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodGet,
 				Path:    "/api/v1/search/semantic",
-				Handler: semanticSearchHandler(serverCtx),
+				Handler: semanticSearchGetHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/api/v1/search/semantic",
+				Handler: semanticSearchPostHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/codebase-indexer"),

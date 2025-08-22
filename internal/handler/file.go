@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/zgsm-ai/codebase-indexer/internal/response"
+	"github.com/zgsm-ai/codebase-indexer/pkg/utils"
 	"net/http"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
@@ -16,6 +17,10 @@ func getFileContentHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		if err := httpx.Parse(r, &req); err != nil {
 			response.Error(w, err)
 			return
+		}
+		relFilePath, err := utils.AbsToRel(req.CodebasePath, req.FilePath)
+		if err == nil {
+			req.FilePath = relFilePath
 		}
 
 		l := logic.NewGetFileContentLogic(r.Context(), svcCtx)
