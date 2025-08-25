@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/zgsm-ai/codebase-indexer/internal/types"
 	"path"
 	"path/filepath"
 	"runtime"
@@ -13,7 +14,7 @@ func ToUnixPath(rawPath string) string {
 	// path.Clean 会自动处理为 Unix 风格路径，去除多余的 /、. 和 ..
 	filePath := path.Clean(rawPath)
 	filePath = filepath.ToSlash(filePath)
-	return filePath
+	return strings.ReplaceAll(filePath, "\\", "/")
 }
 
 // PathEqual 比较路径是否相等，/ \ 转为 /
@@ -59,9 +60,45 @@ func IsHiddenFile(path string) bool {
 	return false
 }
 
-// AbsToRel 将绝对路径转换为相对于基准目录的相对路径
+// IsAbs 判断路径是否为绝对路径（自动适配 Windows、Linux、macOS）
+// 只要符合任一系统的绝对路径规则，就返回 true
+func IsAbs(path string) bool {
+	if path == "" {
+		return false
+	}
+
+	// 1. 判断是否为 Unix 风格绝对路径（Linux/macOS，以 / 开头）
+	if path[0] == '/' {
+		return true
+	}
+
+	// 2. 判断是否为 Windows 风格绝对路径
+	// 2.1 UNC 路径（以 \\ 开头，如 \\server\share）
+	if len(path) >= 2 && path[0] == '\\' && path[1] == '\\' {
+		return true
+	}
+
+	// 2.2 盘符路径（如 C:\ 或 C:/）
+	if len(path) >= 3 && path[1] == ':' {
+		if (path[2] == '\\' || path[2] == '/') &&
+			(path[0] >= 'A' && path[0] <= 'Z' || path[0] >= 'a' && path[0] <= 'z') {
+			return true
+		}
+	}
+
+	// 不符合任何系统的绝对路径规则
+	return false
+}
+
+// AbsToUnixRel 将绝对路径转换为相对于基准目录的相对路径
 // 支持Windows、Linux、macOS等操作系统
-func AbsToRel(baseDir, absPath string) (string, error) {
+func AbsToUnixRel(baseDir, absPath string) (string, error) {
+	baseDir = ToUnixPath(baseDir)
+	absPath = ToUnixPath(absPath)
+	// 如果本身是相对路径，直接返回
+	if !IsAbs(absPath) {
+		return absPath, nil
+	}
 	absBase := filepath.Clean(baseDir)
 	// 2. 标准化目标绝对路径
 	absPath = filepath.Clean(absPath)
@@ -78,11 +115,6 @@ func AbsToRel(baseDir, absPath string) (string, error) {
 	}
 
 	// 4. 计算相对路径
-	relPath, err := filepath.Rel(absBase, absPath)
-	if err != nil {
-		return "", fmt.Errorf("计算相对路径失败: %w", err)
-	}
+	return strings.TrimPrefix(strings.ReplaceAll(absPath, baseDir, types.EmptyString), "/"), nil
 
-	// 5. 统一使用正斜杠输出（可选，根据需求调整）
-	return filepath.ToSlash(relPath), nil
 }

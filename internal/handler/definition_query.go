@@ -19,7 +19,7 @@ func definitionQueryHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 		// 转换为相对路径
-		relFilePath, err := utils.AbsToRel(req.CodebasePath, req.FilePath)
+		relFilePath, err := utils.AbsToUnixRel(req.CodebasePath, req.FilePath)
 		if err == nil {
 			req.FilePath = relFilePath
 		}

@@ -18,7 +18,7 @@ func definitionParseHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			response.Error(w, err)
 			return
 		}
-		relFilePath, err := utils.AbsToRel(req.CodebasePath, req.FilePath)
+		relFilePath, err := utils.AbsToUnixRel(req.CodebasePath, req.FilePath)
 		if err == nil {
 			req.FilePath = relFilePath
 		}
