@@ -14,16 +14,16 @@ func getCodebaseHashHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.CodebaseHashRequest
 		if err := httpx.Parse(r, &req); err != nil {
-			response.Error(w, err)
+			response.ErrorWithIntCode(w, err)
 			return
 		}
 
 		l := logic.NewCompareCodebaseLogic(r.Context(), svcCtx)
 		resp, err := l.GetCodebaseHash(&req)
 		if err != nil {
-			response.Error(w, err)
+			response.ErrorWithIntCode(w, err)
 		} else {
-			response.Json(w, resp)
+			response.JsonWithIntCode(w, resp)
 		}
 	}
 }

@@ -37,16 +37,16 @@ func syncFilesHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.FileUploadRequest
 		if err := httpx.Parse(r, &req); err != nil {
-			response.Error(w, err)
+			response.ErrorWithIntCode(w, err)
 			return
 		}
 
 		l := logic.NewSyncFilesLogic(r.Context(), svcCtx)
 		err := l.SyncFiles(&req, r)
 		if err != nil {
-			response.Error(w, err)
+			response.ErrorWithIntCode(w, err)
 		} else {
-			response.Ok(w)
+			response.OkWithIntCode(w)
 		}
 	}
 }
