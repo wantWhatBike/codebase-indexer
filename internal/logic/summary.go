@@ -163,14 +163,14 @@ func (l *SummaryLogic) Summary(req *types.IndexSummaryRequest) (*types.IndexSumm
 	if embeddingIndexTask != nil {
 		resp.Embedding.Status = convertStatus(embeddingIndexTask.Status)
 		resp.Embedding.LastIndexAt = embeddingIndexTask.UpdatedAt.Format("2006-01-02 15:04:05")
-	} else if embeddingSummary.TotalChunks > 0 {
+	} else if embeddingSummary != nil && embeddingSummary.TotalChunks > 0 {
 		resp.Embedding.Status = types.TaskStatusSuccess
 	}
 
 	if codegraphIndexTask != nil {
 		resp.CodeGraph.Status = convertStatus(codegraphIndexTask.Status)
 		resp.CodeGraph.LastIndexAt = codegraphIndexTask.UpdatedAt.Format("2006-01-02 15:04:05")
-	} else if codegraphSummary.TotalFiles > 0 {
+	} else if codegraphSummary != nil && codegraphSummary.TotalFiles > 0 {
 		resp.CodeGraph.Status = types.TaskStatusSuccess
 	}
 	if lastSyncHistory != nil {
