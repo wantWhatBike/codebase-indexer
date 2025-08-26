@@ -190,11 +190,12 @@ func (l *SummaryLogic) Summary(req *types.IndexSummaryRequest) (*types.IndexSumm
 
 func getCodegraphSummary(ctx context.Context, codebase *model.Codebase) (*types.CodeGraphSummary, error) {
 	graphStore, err := codegraph.NewBadgerDBGraph(codegraph.WithPath(filepath.Join(codebase.Path, types.CodebaseIndexDir)))
-	defer graphStore.Close()
 	if err != nil {
 		tracer.WithTrace(ctx).Errorf("failed to open graph store, err:%w", err)
 		return nil, err
 	}
+	defer graphStore.Close()
+
 	return graphStore.GetIndexSummary(ctx, codebase.ID, codebase.Path)
 }
 
