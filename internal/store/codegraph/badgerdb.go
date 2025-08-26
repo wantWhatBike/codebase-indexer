@@ -79,6 +79,12 @@ func NewBadgerDBGraph(opts ...GraphOption) (GraphStore, error) {
 func openWithRetry(badgerOpts badger.Options, dbPath string) (*badger.DB, error) {
 	var badgerDB *badger.DB
 	var err error
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("badger db open failed with panic, err: %v", r)
+		}
+	}()
+
 	for i := 1; i <= openMaxRetries; i++ {
 
 		badgerDB, err = badger.Open(badgerOpts)
